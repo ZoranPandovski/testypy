@@ -8,7 +8,8 @@ import subprocess
 is_installed_from_pypi = False
 
 
-def remove_requirements(requirements, name, replace=None):
+
+def remove_requirements(requirements, name, replace=''):
     new_requirements = []
     for requirement in requirements:
         if requirement.split(' ')[0] != name:
@@ -18,6 +19,7 @@ def remove_requirements(requirements, name, replace=None):
     return new_requirements
 
 sys_platform = sys.platform
+
 
 with open('requirements.txt') as req_file:
     requirements = [req.strip() for req in req_file.read().splitlines()]
@@ -35,36 +37,25 @@ elif sys_platform == 'darwin':
 
 # Windows specific requirements
 elif sys_platform in ['win32','cygwin','windows']:
-    if is_installed_from_pypi:
-        requirements = remove_requirements(requirements,'torch')
-        requirements = remove_requirements(requirements,'torchvision')
-
-   
-
-    requirements.append('cwrap')
-
-# For stuff like freebsd
-else:
-    print('\n\n====================\n\nError, platform {sys_platform} not recognized, proceeding to install anyway, but testypy might not work properly !\n\n====================\n\n')
-
-if is_installed_from_pypi and (sys_platform in ['win32','cygwin','windows']):
+    requirements = remove_requirements(requirements,'torch')
+    requirements = remove_requirements(requirements,'torchvision')
     try:
-        subprocess.call(['pip','install','torch===1.3.1 torchvision===0.4.2 -f https://download.pytorch.org/whl/torch_stable.html'])
+        subprocess.call(['pip','install','torch===1.3.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
         print('Successfully installed pytorch !')
     except:
         print('Failed to install pytroch, please install pytroch and torchvision manually be following the simple instructions over at: https://pytorch.org/get-started/locally/')
 
-  
 
+    #requirements.append('cwrap')
 
 setuptools.setup(name='testypy',
-      version='0.9.5',
+      version='1.1.1',
       description='The testpypy awesome module',
       url='https://github.com/ZoranPandovski/testypy',
       author='Zoran Pan',
       author_email='zoran.pandovski@gmail.com',
       license='MIT',
-      packages=['testypy'],
+      packages=setuptools.find_packages(),
       package_data={'project': ['requirements.txt']},
       install_requires=requirements,
       zip_safe=False)
